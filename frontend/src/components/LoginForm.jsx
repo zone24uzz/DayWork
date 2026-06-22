@@ -1,8 +1,5 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
-
-const HAS_GOOGLE_CLIENT_ID = !!import.meta.env.VITE_GOOGLE_CLIENT_ID
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 
@@ -35,8 +32,9 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!email.trim() || !password.trim()) {
       setError('Iltimos, email va parolni kiriting')
@@ -46,25 +44,20 @@ const LoginForm = () => {
       setError('Iltimos, foydalanish shartlariga rozilik bildiring')
       return
     }
-    // Mock auth — in production replace with real API call
-    login({ name: email.split('@')[0], email, avatar: email[0].toUpperCase(), createdAt: new Date().getFullYear().toString() })
-    navigate('/home')
-  }
+    setError('')
+    setIsLoading(true)
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    // Decode the JWT credential to get user info
     try {
-      const base64 = credentialResponse.credential.split('.')[1]
-      const payload = JSON.parse(atob(base64))
-      login({
-        name: payload.name,
-        email: payload.email,
-        avatar: payload.picture,
-        sub: payload.sub,
-      })
-      navigate('/home')
-    } catch {
-      setError('Google orqali kirishda xatolik yuz berdi')
+      const data = await login(email, password)
+      if (data.user.userType === 'employer') {
+        navigate('/employer')
+      } else {
+        navigate('/home')
+      }
+    } catch (err) {
+      setError(err.message || 'Kirishda xatolik')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -77,15 +70,16 @@ const LoginForm = () => {
       animate="visible"
     >
       <motion.div className="flex flex-col gap-1.5" variants={fieldVariants}>
-        <label htmlFor="email" className="text-sm font-medium text-gray-700">Email yoki telefon raqami</label>
+        <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
         <input
           id="email"
-          type="text"
-          placeholder="Email yoki telefon raqami"
+          type="email"
+          placeholder="Email manzilingiz"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
           className="w-full px-3.5 py-3 border border-gray-200 rounded-xl text-[15px] text-gray-800 bg-gray-50 outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-[#4f6ef7] focus:bg-white focus:shadow-[0_0_0_3px_rgba(79,110,247,0.1)]"
+          required
         />
       </motion.div>
 
@@ -100,6 +94,7 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
             className="w-full px-3.5 py-3 pr-11 border border-gray-200 rounded-xl text-[15px] text-gray-800 bg-gray-50 outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-[#4f6ef7] focus:bg-white focus:shadow-[0_0_0_3px_rgba(79,110,247,0.1)]"
+            required
           />
           <button
             type="button"
@@ -167,38 +162,16 @@ const LoginForm = () => {
       <motion.div variants={fieldVariants}>
         <button
           type="submit"
-          disabled={!agreeToTerms}
+          disabled={!agreeToTerms || isLoading}
           className={`w-full py-3.5 text-white border-none rounded-xl text-base font-semibold transition-all duration-200 active:translate-y-[1px] ${
-            agreeToTerms
+            agreeToTerms && !isLoading
               ? 'bg-[#4f6ef7] hover:bg-[#3b5de7] hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] cursor-pointer'
               : 'bg-[#4f6ef7]/50 cursor-not-allowed'
           }`}
         >
-          Kirish
+          {isLoading ? 'Yuklanmoqda...' : 'Kirish'}
         </button>
       </motion.div>
-
-      {HAS_GOOGLE_CLIENT_ID && (
-        <>
-          <motion.div className="flex items-center gap-4 text-gray-400 text-xs" variants={fieldVariants}>
-            <span className="flex-1 h-px bg-gray-200"></span>
-            <span>yoki</span>
-            <span className="flex-1 h-px bg-gray-200"></span>
-          </motion.div>
-
-          <motion.div variants={fieldVariants}>
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google orqali kirishda xatolik')}
-              text="signin_with"
-              shape="rectangular"
-              size="large"
-              width="100%"
-              theme="outline"
-            />
-          </motion.div>
-        </>
-      )}
 
       <motion.p className="text-center text-sm text-gray-500 mt-1" variants={fieldVariants}>
         Akkountingiz yo'qmi?{' '}
