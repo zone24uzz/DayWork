@@ -25,13 +25,13 @@ const fieldVariants = {
 
 const RegisterForm = () => {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { register } = useAuth()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     company: '',
-    job: '',
+    position: '',
     phone: '',
     userType: '',
     confirmPassword: '',
@@ -40,27 +40,52 @@ const RegisterForm = () => {
   const [showConfirm, setShowConfirm] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [termsError, setTermsError] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!agreeToTerms) {
       setTermsError('Iltimos, foydalanish shartlariga rozilik bildiring')
       return
     }
+    if (!formData.userType) {
+      setError('Iltimos, ishchi yoki ish beruvchi ekanligingizni tanlang')
+      return
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Parollar mos kelmaydi')
+      return
+    }
     setTermsError('')
-    // Mock registration — in production replace with real API call
-    login({
-      name: formData.fullName || 'Foydalanuvchi',
-      email: formData.email,
-      phone: formData.phone,
-      avatar: (formData.fullName || 'F')[0].toUpperCase(),
-      createdAt: new Date().getFullYear().toString(),
-    })
-    navigate('/home')
+    setError('')
+    setIsLoading(true)
+
+    try {
+      await register({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        company: formData.company,
+        position: formData.position,
+        userType: formData.userType,
+      })
+
+      if (formData.userType === 'employer') {
+        navigate('/employer')
+      } else {
+        navigate('/home')
+      }
+    } catch (err) {
+      setError(err.message || 'Ro\'yxatdan o\'tishda xatolik')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const inputClass = "w-full py-2.5 pr-9 border-0 border-b-[1.5px] border-gray-200 text-sm text-gray-800 bg-transparent outline-none transition-all duration-200 placeholder:text-gray-400 focus:border-[#4f6ef7] focus:shadow-none focus:bg-transparent"
@@ -83,19 +108,21 @@ const RegisterForm = () => {
           onChange={handleChange('fullName')}
           autoComplete="name"
           className={inputClass}
+          required
         />
       </motion.div>
 
       <motion.div className="flex flex-col gap-1" variants={fieldVariants}>
-        <label htmlFor="regEmail" className="text-xs font-medium text-gray-500">Email yoki telefon</label>
+        <label htmlFor="regEmail" className="text-xs font-medium text-gray-500">Email</label>
         <input
           id="regEmail"
-          type="text"
-          placeholder="Email yoki telefon raqamingiz"
+          type="email"
+          placeholder="Email manzilingiz"
           value={formData.email}
           onChange={handleChange('email')}
           autoComplete="email"
           className={inputClass}
+          required
         />
       </motion.div>
 
@@ -112,42 +139,29 @@ const RegisterForm = () => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="job" className="text-xs font-medium text-gray-500">Lavozim</label>
+          <label htmlFor="position" className="text-xs font-medium text-gray-500">Lavozim</label>
           <input
-            id="job"
+            id="position"
             type="text"
             placeholder="Lavozimingiz"
-            value={formData.job}
-            onChange={handleChange('job')}
+            value={formData.position}
+            onChange={handleChange('position')}
             className={inputClass}
           />
         </div>
       </motion.div>
 
-      <motion.div className="grid grid-cols-2 gap-4" variants={fieldVariants}>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="phone" className="text-xs font-medium text-gray-500">Telefon raqam</label>
-          <input
-            id="phone"
-            type="tel"
-            placeholder="+998 XX XXX XX XX"
-            value={formData.phone}
-            onChange={handleChange('phone')}
-            autoComplete="tel"
-            className={inputClass}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="job" className="text-xs font-medium text-gray-500">Lavozim</label>
-          <input
-            id="job"
-            type="text"
-            placeholder="Lavozimingiz"
-            value={formData.job}
-            onChange={handleChange('job')}
-            className={inputClass}
-          />
-        </div>
+      <motion.div className="flex flex-col gap-1" variants={fieldVariants}>
+        <label htmlFor="phone" className="text-xs font-medium text-gray-500">Telefon raqam</label>
+        <input
+          id="phone"
+          type="tel"
+          placeholder="+998 XX XXX XX XX"
+          value={formData.phone}
+          onChange={handleChange('phone')}
+          autoComplete="tel"
+          className={inputClass}
+        />
       </motion.div>
 
       <motion.div className="flex flex-col gap-1" variants={fieldVariants}>
@@ -198,6 +212,7 @@ const RegisterForm = () => {
               onChange={handleChange('password')}
               autoComplete="new-password"
               className={inputClass}
+              required
             />
             <button
               type="button"
@@ -232,6 +247,7 @@ const RegisterForm = () => {
               onChange={handleChange('confirmPassword')}
               autoComplete="new-password"
               className={inputClass}
+              required
             />
             <button
               type="button"
@@ -255,6 +271,16 @@ const RegisterForm = () => {
           </div>
         </div>
       </motion.div>
+
+      {error && (
+        <motion.p
+          className="text-xs text-red-500 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          {error}
+        </motion.p>
+      )}
 
       <motion.div variants={fieldVariants}>
         <label className="flex items-start gap-2.5 text-sm text-gray-500 cursor-pointer select-none">
@@ -286,14 +312,14 @@ const RegisterForm = () => {
       <motion.div variants={fieldVariants}>
         <button
           type="submit"
-          disabled={!agreeToTerms}
+          disabled={!agreeToTerms || isLoading}
           className={`w-full py-3.5 text-white border-none rounded-xl text-base font-semibold transition-all duration-200 active:translate-y-[1px] ${
-            agreeToTerms
+            agreeToTerms && !isLoading
               ? 'bg-[#4f6ef7] hover:bg-[#3b5de7] hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] cursor-pointer'
               : 'bg-[#4f6ef7]/50 cursor-not-allowed'
           }`}
         >
-          Akkount yaratish
+          {isLoading ? 'Yuklanmoqda...' : 'Akkount yaratish'}
         </button>
       </motion.div>
     </motion.form>

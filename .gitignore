@@ -22,4 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Data, Database & Secrets
 backend/data/db/
+backend/mongodb/
+backend/mongodb-windows.zip
+backend/.env

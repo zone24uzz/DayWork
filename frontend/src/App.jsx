@@ -1,9 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import EmployerLayout from './components/EmployerLayout'
 import AuthPage from './pages/AuthPage'
 import MainPage from './pages/MainPage'
 import ProfilePage from './pages/ProfilePage'
+import EmployerDashboard from './pages/EmployerDashboard'
+import EmployerJobsPage from './pages/EmployerJobsPage'
+import EmployerMessagesPage from './pages/EmployerMessagesPage'
+import EmployerWalletPage from './pages/EmployerWalletPage'
+import EmployerHistoryPage from './pages/EmployerHistoryPage'
 
 const App = () => {
   return (
@@ -20,6 +26,20 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/employer"
+            element={
+              <ProtectedRoute>
+                <EmployerLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<EmployerDashboard />} />
+            <Route path="jobs" element={<EmployerJobsPage />} />
+            <Route path="messages" element={<EmployerMessagesPage />} />
+            <Route path="wallet" element={<EmployerWalletPage />} />
+            <Route path="history" element={<EmployerHistoryPage />} />
+          </Route>
           <Route
             path="/profile"
             element={
