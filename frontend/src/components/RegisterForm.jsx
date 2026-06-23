@@ -79,7 +79,7 @@ const RegisterForm = () => {
       if (formData.userType === 'employer') {
         navigate('/employer')
       } else {
-        navigate('/home')
+        navigate('/worker')
       }
     } catch (err) {
       setError(err.message || 'Ro\'yxatdan o\'tishda xatolik')

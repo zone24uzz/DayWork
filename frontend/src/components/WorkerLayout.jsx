@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext'
 
 const sidebarItems = [
   {
-    label: 'Boshqaruv paneli',
-    to: '/employer',
+    label: 'Asosiy panel',
+    to: '/worker',
     end: true,
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -17,8 +17,8 @@ const sidebarItems = [
     ),
   },
   {
-    label: 'Ishlar',
-    to: '/employer/jobs',
+    label: 'Mening ishlarim',
+    to: '/worker/my-jobs',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -30,7 +30,7 @@ const sidebarItems = [
   },
   {
     label: 'Xabarlar',
-    to: '/employer/messages',
+    to: '/worker/messages',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -39,7 +39,7 @@ const sidebarItems = [
   },
   {
     label: 'Hamyon',
-    to: '/employer/wallet',
+    to: '/worker/wallet',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
@@ -49,7 +49,7 @@ const sidebarItems = [
   },
   {
     label: 'Tarix',
-    to: '/employer/history',
+    to: '/worker/history',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
@@ -59,7 +59,7 @@ const sidebarItems = [
   },
   {
     label: 'Profil',
-    to: '/employer/profile',
+    to: '/worker/profile',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -71,19 +71,14 @@ const sidebarItems = [
 
 const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
   <>
-    {/* Mobile overlay */}
     {isOpen && (
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden" onClick={onClose} />
     )}
     <aside
       className={`fixed top-0 left-0 h-screen w-[260px] bg-white border-r border-gray-100 flex flex-col z-40 transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
     >
-      {/* Logo */}
       <div className="px-5 py-5 border-b border-gray-100">
         <Link to="/home" className="flex items-center gap-2.5 no-underline">
           <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
@@ -92,13 +87,22 @@ const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
           </svg>
           <div>
             <span className="text-lg font-bold text-[#1a1a2e] block leading-tight">DayWork</span>
-            <span className="text-[10px] text-gray-400">Ish beruvchi paneli</span>
+            <span className="text-[10px] text-gray-400">Ishchi paneli</span>
           </div>
         </Link>
       </div>
 
-      {/* Nav items */}
-      <nav className="flex-1 px-3 py-3 overflow-y-auto">
+      <div className="px-3 py-3">
+        <Link to="/worker/search" onClick={onClose} className="w-full flex items-center gap-2 px-4 py-2.5 bg-[#4f6ef7] hover:bg-[#3b5de7] text-white rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] no-underline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          Ish qidirish
+        </Link>
+      </div>
+
+      <nav className="flex-1 px-3 py-1 overflow-y-auto">
         {sidebarItems.map((item) => (
           <NavLink
             key={item.label}
@@ -123,23 +127,8 @@ const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
         ))}
       </nav>
 
-      {/* Create job button */}
-      <div className="px-3 py-2">
-        <Link to="/employer/post-job" onClick={onClose} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#4f6ef7] hover:bg-[#3b5de7] text-white rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] no-underline">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          Ish e'lonini qo'shish
-        </Link>
-      </div>
-
-      {/* Bottom items */}
       <div className="px-3 py-3 border-t border-gray-100">
-        <a
-          href="#"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#1a1a2e] transition-all duration-200 mb-1 no-underline"
-        >
+        <a href="#" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#1a1a2e] transition-all duration-200 mb-1 no-underline">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
@@ -147,11 +136,7 @@ const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
           </svg>
           Yordam markazi
         </a>
-        <a
-          href="#"
-          onClick={(e) => { e.preventDefault(); onLogout() }}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all duration-200 mb-1 no-underline"
-        >
+        <a href="#" onClick={(e) => { e.preventDefault(); onLogout() }} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all duration-200 mb-1 no-underline">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
@@ -164,8 +149,8 @@ const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
             {user?.avatar || (user?.name?.[0]?.toUpperCase() || 'U')}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">Kompaniya profili</p>
-            <p className="text-[11px] text-gray-400 truncate">Korxona</p>
+            <p className="text-sm font-medium text-gray-800 truncate">{user?.name || 'Ishchi'}</p>
+            <p className="text-[11px] text-gray-400 truncate">Ishchi profili</p>
           </div>
         </div>
       </div>
@@ -173,7 +158,7 @@ const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
   </>
 )
 
-const EmployerLayout = () => {
+const WorkerLayout = () => {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -187,11 +172,8 @@ const EmployerLayout = () => {
     <div className="min-h-screen bg-[#f5f6fa]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} user={user} onLogout={handleLogout} />
 
-      {/* Main content */}
       <main className="lg:ml-[260px] min-h-screen">
-        {/* Top bar */}
         <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center gap-3">
-          {/* Mobile hamburger */}
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer border-0 bg-transparent shrink-0"
@@ -203,7 +185,6 @@ const EmployerLayout = () => {
             </svg>
           </button>
 
-          {/* Search */}
           <div className="relative flex-1 max-w-xl hidden sm:block">
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8" />
@@ -211,7 +192,7 @@ const EmployerLayout = () => {
             </svg>
             <input
               type="text"
-              placeholder="Ishchilarni, ishlarni qidirish..."
+              placeholder="Ish qidirish..."
               className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white focus:shadow-[0_0_0_3px_rgba(79,110,247,0.1)] transition-all placeholder:text-gray-400"
             />
           </div>
@@ -224,7 +205,7 @@ const EmployerLayout = () => {
               </svg>
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
-            <Link to="/employer/profile" className="flex items-center gap-2 pl-2 sm:pl-4 sm:border-l border-gray-200 no-underline">
+            <Link to="/worker/profile" className="flex items-center gap-2 pl-2 sm:pl-4 sm:border-l border-gray-200 no-underline">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white text-sm font-semibold flex items-center justify-center shrink-0">
                 {user?.avatar || (user?.name?.[0]?.toUpperCase() || 'U')}
               </div>
@@ -233,7 +214,6 @@ const EmployerLayout = () => {
           </div>
         </div>
 
-        {/* Page content */}
         <div className="p-4 sm:p-6 lg:p-8">
           <Outlet />
         </div>
@@ -242,4 +222,4 @@ const EmployerLayout = () => {
   )
 }
 
-export default EmployerLayout
+export default WorkerLayout

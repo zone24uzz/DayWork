@@ -52,7 +52,7 @@ const LoginForm = () => {
       if (data.user.userType === 'employer') {
         navigate('/employer')
       } else {
-        navigate('/home')
+        navigate('/worker')
       }
     } catch (err) {
       setError(err.message || 'Kirishda xatolik')

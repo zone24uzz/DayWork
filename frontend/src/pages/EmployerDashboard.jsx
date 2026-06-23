@@ -57,18 +57,18 @@ const EmployerDashboard = () => {
     <>
       {/* Header */}
       <motion.div
-        className="flex items-start justify-between mb-8"
+        className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 sm:mb-8"
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
         <div>
-          <h1 className="text-2xl font-bold text-[#1a1a2e] mb-1">Ish Beruvchi Paneli</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a2e] mb-1">Ish Beruvchi Paneli</h1>
           <p className="text-sm text-gray-500">Faoliyatingizning umumiy ko'rinishi.</p>
         </div>
         <Link
           to="/employer/jobs"
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#4f6ef7] hover:bg-[#3b5de7] text-white rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] no-underline whitespace-nowrap"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#4f6ef7] hover:bg-[#3b5de7] text-white rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] no-underline whitespace-nowrap shrink-0"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />

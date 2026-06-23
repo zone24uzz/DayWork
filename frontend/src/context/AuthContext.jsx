@@ -8,7 +8,7 @@ export const useAuth = () => {
   return ctx
 }
 
-const API_URL = 'http://localhost:5000/api'
+const API_URL = '/api'
 const TOKEN_KEY = 'daywork_token'
 const USER_KEY = 'daywork_user'
 
