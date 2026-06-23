@@ -1,0 +1,11 @@
+{
+  "name": "daywork",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DayWork — full-stack job platform",
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node server.js"
+  }
+}

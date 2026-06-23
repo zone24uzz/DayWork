@@ -1,45 +1,21 @@
 require('dotenv').config()
-const express = require('express')
 const http = require('http')
-const cors = require('cors')
 const { Server } = require('socket.io')
-const connectDB = require('./config/db')
-const authRoutes = require('./routes/auth')
-const messageRoutes = require('./routes/messages')
-const jobRoutes = require('./routes/jobs')
+const app = require('./app')
 
-// Connect to MongoDB
-connectDB()
-
-const app = express()
 const server = http.createServer(app)
 
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
     methods: ['GET', 'POST'],
   },
 })
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
-  credentials: true,
-}))
-app.use(express.json())
-
-// Routes
-app.use('/api/auth', authRoutes)
-app.use('/api/messages', messageRoutes)
-app.use('/api/jobs', jobRoutes)
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-})
-
-// Socket.IO
+// Online users tracking
 const onlineUsers = new Map()
 
 io.on('connection', (socket) => {
