@@ -1,6 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
+import L from 'leaflet'
 import { useAuth } from '../context/AuthContext'
+
+// Fix default marker icon
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
+
+const TASHKENT_CENTER = [41.2995, 69.2401]
 
 const categories = [
   'Qurilish',
@@ -12,6 +24,27 @@ const categories = [
   'Parrandachilik',
   'Mehmonxona',
 ]
+
+// Component that handles map click to place marker
+const LocationMarker = ({ position, onPositionChange }) => {
+  useMapEvents({
+    click(e) {
+      onPositionChange([e.latlng.lat, e.latlng.lng])
+    },
+  })
+  return position ? <Marker position={position} /> : null
+}
+
+// Component to recenter map when position changes
+const RecenterMap = ({ position }) => {
+  const map = useMap()
+  useEffect(() => {
+    if (position) {
+      map.setView(position, 15)
+    }
+  }, [position, map])
+  return null
+}
 
 const EmployerPostJobPage = () => {
   const { apiCall } = useAuth()
@@ -29,6 +62,33 @@ const EmployerPostJobPage = () => {
   const [images, setImages] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [mapPosition, setMapPosition] = useState(null)
+
+  // Get user geolocation on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setMapPosition([pos.coords.latitude, pos.coords.longitude]),
+        () => setMapPosition(TASHKENT_CENTER),
+        { enableHighAccuracy: true, timeout: 10000 }
+      )
+    } else {
+      setMapPosition(TASHKENT_CENTER)
+    }
+  }, [])
+
+  const handleMapPositionChange = useCallback((pos) => {
+    setMapPosition(pos)
+    // Reverse geocode to fill location text
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos[0]}&lon=${pos[1]}&accept-language=uz`)
+      .then(res => res.json())
+      .then(data => {
+        const addr = data.display_name || ''
+        const shortAddr = addr.split(',').slice(0, 3).join(',')
+        setForm(prev => ({ ...prev, location: shortAddr }))
+      })
+      .catch(() => {})
+  }, [])
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -56,7 +116,7 @@ const EmployerPostJobPage = () => {
     e.preventDefault()
     setError('')
 
-    if (!form.title || !form.location || !form.category || !form.budget) {
+    if (!form.title || !form.category || !form.budget) {
       setError('Iltimos, barcha majburiy maydonlarni to\'ldiring')
       return
     }
@@ -67,7 +127,11 @@ const EmployerPostJobPage = () => {
         method: 'POST',
         body: JSON.stringify({
           title: form.title,
-          location: form.location,
+          location: {
+            address: form.location,
+            lat: mapPosition?.[0] || null,
+            lng: mapPosition?.[1] || null,
+          },
           category: form.category,
           date: form.date,
           time: form.time,
@@ -106,7 +170,7 @@ const EmployerPostJobPage = () => {
           </div>
         )}
 
-        {/* Title & Location */}
+        {/* Title & Category */}
         <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Ish nomi */}
@@ -140,30 +204,6 @@ const EmployerPostJobPage = () => {
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
-            </div>
-
-            {/* Manzil */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Manzil
-              </label>
-              <div className="relative">
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                <input
-                  type="text"
-                  name="location"
-                  value={form.location}
-                  onChange={handleChange}
-                  placeholder="Toshkent sh., Yunusobod"
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white transition-all placeholder:text-gray-400"
-                />
-              </div>
             </div>
 
             {/* Sana va vaqt */}
@@ -219,6 +259,71 @@ const EmployerPostJobPage = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Map Location Picker */}
+        <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ish joylashuvi (Xaritada bosing)
+          </label>
+          <p className="text-xs text-gray-400 mb-3">
+            Xaritada istalgan joyni bosib, ish joyini belgilang
+          </p>
+
+          {/* Location text input */}
+          <div className="relative mb-4">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <input
+              type="text"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="Manzil (xaritada bosganingizda avtomatik to'ldiriladi)"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white transition-all placeholder:text-gray-400"
+            />
+          </div>
+
+          {/* Leaflet Map */}
+          <div className="w-full h-[280px] rounded-xl overflow-hidden border border-gray-100">
+            {mapPosition && (
+              <MapContainer
+                center={mapPosition}
+                zoom={13}
+                style={{ height: '100%', width: '100%' }}
+                zoomControl={true}
+                attributionControl={false}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <RecenterMap position={mapPosition} />
+                <LocationMarker
+                  position={mapPosition}
+                  onPositionChange={handleMapPositionChange}
+                />
+              </MapContainer>
+            )}
+            {!mapPosition && (
+              <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-8 h-8 border-4 border-gray-200 border-t-[#4f6ef7] rounded-full animate-spin mx-auto" />
+                  <p className="text-sm text-gray-400 mt-3">Xarita yuklanmoqda...</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {mapPosition && (
+            <p className="text-xs text-gray-400 mt-2">
+              📍 Lat: {mapPosition[0].toFixed(5)}, Lng: {mapPosition[1].toFixed(5)}
+            </p>
+          )}
         </div>
 
         {/* Batafsil ma'lumot */}

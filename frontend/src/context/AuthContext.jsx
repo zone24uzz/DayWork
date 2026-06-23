@@ -76,6 +76,23 @@ export const AuthProvider = ({ children }) => {
     return data
   }
 
+  const updateProfile = async (profileData) => {
+    const data = await apiCall('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData),
+    })
+    setUser(data.user)
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user))
+    return data
+  }
+
+  const changePassword = async (currentPassword, newPassword) => {
+    return await apiCall('/auth/password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    })
+  }
+
   const logout = () => {
     setUser(null)
     setToken(null)
@@ -91,6 +108,8 @@ export const AuthProvider = ({ children }) => {
       login,
       register,
       logout,
+      updateProfile,
+      changePassword,
       apiCall,
       isAuthenticated: !!user,
     }}>

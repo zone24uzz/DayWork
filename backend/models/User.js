@@ -38,6 +38,32 @@ const userSchema = new mongoose.Schema({
     enum: ['worker', 'employer'],
     required: [true, 'Foydalanuvchi turini tanlang'],
   },
+  surname: {
+    type: String,
+    trim: true,
+    maxlength: 100,
+    default: '',
+  },
+  age: {
+    type: Number,
+    min: 0,
+    max: 120,
+  },
+  gender: {
+    type: String,
+    enum: ['Erkak', 'Ayol', ''],
+    default: '',
+  },
+  passport: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  jshshir: {
+    type: String,
+    trim: true,
+    default: '',
+  },
   avatar: {
     type: String,
     default: '',
