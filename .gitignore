@@ -28,3 +28,9 @@ backend/data/db/
 backend/mongodb/
 backend/mongodb-windows.zip
 backend/.env
+frontend/.env
+frontend/.env.local
+frontend/.env.production.local
+
+# Vercel
+.vercel

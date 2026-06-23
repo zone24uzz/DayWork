@@ -8,7 +8,7 @@ export const useAuth = () => {
   return ctx
 }
 
-const API_URL = '/api'
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 const TOKEN_KEY = 'daywork_token'
 const USER_KEY = 'daywork_user'
 
