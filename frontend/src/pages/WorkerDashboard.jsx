@@ -12,17 +12,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Custom user location icon
-const userIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
 const TASHKENT_CENTER = [41.2995, 69.2401]
 
 // Component to recenter map when position changes
@@ -41,7 +30,6 @@ const WorkerDashboard = () => {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [userPosition, setUserPosition] = useState(null)
-  const [stats, setStats] = useState({ income: 0, completedJobs: 0, rating: 0 })
 
   // Get user geolocation
   useEffect(() => {
@@ -51,7 +39,6 @@ const WorkerDashboard = () => {
           setUserPosition([pos.coords.latitude, pos.coords.longitude])
         },
         () => {
-          // Default to Tashkent if geolocation denied
           setUserPosition(TASHKENT_CENTER)
         },
         { enableHighAccuracy: true, timeout: 10000 }
@@ -61,12 +48,12 @@ const WorkerDashboard = () => {
     }
   }, [])
 
-  // Fetch nearby jobs from API
+  // Fetch active jobs from API
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const data = await apiCall('/jobs?limit=4&sort=nearby')
-        setJobs(data.jobs || data || [])
+        const data = await apiCall('/jobs?status=active')
+        setJobs((data.jobs || []).slice(0, 4))
       } catch {
         setJobs([])
       } finally {
@@ -76,22 +63,8 @@ const WorkerDashboard = () => {
     fetchJobs()
   }, [apiCall])
 
-  // Fetch worker stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await apiCall('/auth/me/stats')
-        setStats({
-          income: data.income || 0,
-          completedJobs: data.completedJobs || 0,
-          rating: data.rating || 0,
-        })
-      } catch {
-        // Stats will show 0 if API not available
-      }
-    }
-    fetchStats()
-  }, [apiCall])
+  // Count total jobs available
+  const totalJobs = jobs.length
 
   const formatCurrency = (amount) => {
     if (!amount) return '0'
@@ -107,61 +80,76 @@ const WorkerDashboard = () => {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a2e]">Ishchi paneli</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Bizning faoliyatingiz xulosasi.
+            Faoliyatingizning umumiy ko'rinishi
           </p>
         </div>
-        <button className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-white border border-gray-200 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 transition-all cursor-pointer shrink-0">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-          Mavjudligimni belgilash
-        </button>
+        <Link to="/worker/search" className="flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-[#4f6ef7] text-white text-sm font-medium rounded-xl hover:bg-[#3b5de7] transition-all no-underline shrink-0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          Ish qidirish
+        </Link>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
-        {/* Jami daromad */}
+        {/* Mavjud ishlar */}
         <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-500">Jami daromad</p>
+            <p className="text-sm font-medium text-gray-500">Mavjud ishlar</p>
             <div className="w-8 h-8 rounded-lg bg-[#4f6ef7]/10 flex items-center justify-center">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                <line x1="1" y1="10" x2="23" y2="10" />
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#1a1a2e]">{formatCurrency(stats.income)} so'm</p>
+          <p className="text-3xl font-bold text-[#1a1a2e]">{totalJobs}</p>
+          <p className="text-xs text-gray-400 mt-1">ta faol ish</p>
         </div>
 
-        {/* Bajarilgan ishlar */}
+        {/* O'rtacha maosh */}
         <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-500">Bajarilgan ishlar</p>
+            <p className="text-sm font-medium text-gray-500">O'rtacha maosh</p>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#1a1a2e]">{stats.completedJobs}</p>
-          <p className="text-xs text-gray-400 mt-1">ta ish</p>
+          {jobs.length > 0 ? (
+            <>
+              <p className="text-3xl font-bold text-[#1a1a2e]">{formatCurrency(Math.round(jobs.reduce((sum, j) => sum + (j.salary || 0), 0) / jobs.length))}</p>
+              <p className="text-xs text-gray-400 mt-1">so'm / kun</p>
+            </>
+          ) : (
+            <>
+              <p className="text-3xl font-bold text-[#1a1a2e]">—</p>
+              <p className="text-xs text-gray-400 mt-1">ma'lumot yo'q</p>
+            </>
+          )}
         </div>
 
-        {/* O'rtacha reyting */}
+        {/* Kategoriyalar soni */}
         <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-medium text-gray-500">O'rtacha reyting</p>
+            <p className="text-sm font-medium text-gray-500">Kategoriyalar</p>
             <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
               </svg>
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#1a1a2e]">{stats.rating > 0 ? stats.rating.toFixed(1) : '—'}</p>
-          <p className="text-xs text-gray-400 mt-1">/ 5.0</p>
+          <p className="text-3xl font-bold text-[#1a1a2e]">{new Set(jobs.map(j => j.category).filter(Boolean)).size || '—'}</p>
+          <p className="text-xs text-gray-400 mt-1">ta turdagi ish</p>
         </div>
       </div>
 
-      {/* Real Map section */}
+      {/* Map section */}
       <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-8">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold text-[#1a1a2e]">Yaqin atrofdagi ishlar</h2>
@@ -183,29 +171,11 @@ const WorkerDashboard = () => {
                 attribution='&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
               />
               <RecenterMap position={userPosition} />
-              <Marker position={userPosition} icon={userIcon}>
+              <Marker position={userPosition}>
                 <Popup>
                   <strong>Sizning joylashuvingiz</strong>
                 </Popup>
               </Marker>
-
-              {/* Job markers from API */}
-              {jobs.filter(j => j.location?.lat && j.location?.lng).map((job) => (
-                <Marker
-                  key={job._id || job.id}
-                  position={[job.location.lat, job.location.lng]}
-                >
-                  <Popup>
-                    <strong>{job.title}</strong>
-                    <br />
-                    <span>{job.location?.address || ''}</span>
-                    <br />
-                    <span style={{ fontWeight: 600, color: '#4f6ef7' }}>
-                      {job.budget?.toLocaleString('uz-UZ')} so'm
-                    </span>
-                  </Popup>
-                </Marker>
-              ))}
             </MapContainer>
           )}
           {!userPosition && (
@@ -221,7 +191,7 @@ const WorkerDashboard = () => {
 
       {/* Jobs from API */}
       <div>
-        <h2 className="text-lg font-semibold text-[#1a1a2e] mb-5">Sizga tavsiya etilgan ishlar</h2>
+        <h2 className="text-lg font-semibold text-[#1a1a2e] mb-5">So'nggi ish e'lonlari</h2>
 
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -242,7 +212,7 @@ const WorkerDashboard = () => {
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
-            <p className="text-gray-400 text-sm">Hozircha yaqin atrofda ishlar yo'q</p>
+            <p className="text-gray-400 text-sm">Hozircha faol ish e'lonlari yo'q</p>
             <Link
               to="/worker/search"
               className="inline-block mt-3 px-4 py-2 bg-[#4f6ef7] text-white text-sm font-medium rounded-xl no-underline hover:bg-[#3b5de7] transition-all"
@@ -263,28 +233,31 @@ const WorkerDashboard = () => {
                       {job.category}
                     </span>
                   )}
+                  {job.isUrgent && (
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-red-50 text-red-600">
+                      Shoshilinch
+                    </span>
+                  )}
                 </div>
 
                 {/* Title */}
                 <h3 className="text-sm font-semibold text-[#1a1a2e] mb-2 leading-snug">{job.title}</h3>
 
                 {/* Location */}
-                {job.location?.address && (
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                    <span className="text-xs text-gray-400">{job.location.address}</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-1.5 mb-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span className="text-xs text-gray-400">{job.location || "Noma'lum"}</span>
+                </div>
 
                 {/* Salary */}
                 <div className="mt-auto pt-4">
                   <p className="text-xl font-bold text-[#1a1a2e]">
-                    {job.budget ? job.budget.toLocaleString('uz-UZ') : '—'}
+                    {job.salary ? job.salary.toLocaleString('uz-UZ') : '—'}
                   </p>
-                  <p className="text-xs text-gray-400">UZS</p>
+                  <p className="text-xs text-gray-400">UZS / {job.salaryPeriod || 'kun'}</p>
                 </div>
 
                 {/* Action button */}
@@ -292,7 +265,7 @@ const WorkerDashboard = () => {
                   to="/worker/search"
                   className="mt-4 w-full py-2.5 text-center text-sm font-semibold text-[#4f6ef7] bg-[#4f6ef7]/5 hover:bg-[#4f6ef7] hover:text-white rounded-xl transition-all duration-200 no-underline"
                 >
-                  Qabul qilish
+                  Ko'rish
                 </Link>
               </div>
             ))}

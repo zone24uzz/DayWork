@@ -69,7 +69,7 @@ const AuthPage = () => {
           transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <rect width="36" height="36" rx="8" fill="#4F6EF7" />
+            <rect width="36" height="36" rx="18" fill="#4F6EF7" />
             <path d="M10 26V10h6l4 8 4-8h6v16h-5V17l-3 5-3-5v9h-5z" fill="white" />
           </svg>
           <h1 className="text-[28px] font-bold text-white tracking-tight">DayWork</h1>

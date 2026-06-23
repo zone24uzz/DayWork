@@ -82,7 +82,7 @@ const Sidebar = ({ isOpen, onClose, user, onLogout }) => (
       <div className="px-5 py-5 border-b border-gray-100">
         <Link to="/home" className="flex items-center gap-2.5 no-underline">
           <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
-            <rect width="36" height="36" rx="8" fill="#4F6EF7" />
+            <rect width="36" height="36" rx="18" fill="#4F6EF7" />
             <path d="M10 26V10h6l4 8 4-8h6v16h-5V17l-3 5-3-5v9h-5z" fill="white" />
           </svg>
           <div>

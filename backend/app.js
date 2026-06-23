@@ -5,6 +5,7 @@ const connectDB = require('./config/db')
 const authRoutes = require('./routes/auth')
 const messageRoutes = require('./routes/messages')
 const jobRoutes = require('./routes/jobs')
+const walletRoutes = require('./routes/wallet')
 
 // Connect to MongoDB
 connectDB()
@@ -24,6 +25,8 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/messages', messageRoutes)
 app.use('/api/jobs', jobRoutes)
+app.use('/api/wallet', walletRoutes)
+
 
 // Health check
 app.get('/api/health', (req, res) => {

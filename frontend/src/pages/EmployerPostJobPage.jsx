@@ -56,7 +56,10 @@ const EmployerPostJobPage = () => {
     category: '',
     date: '',
     time: '',
-    budget: '',
+    salary: '',
+    salaryPeriod: 'kun',
+    workersNeeded: 1,
+    isUrgent: false,
     description: '',
   })
   const [images, setImages] = useState([])
@@ -116,7 +119,7 @@ const EmployerPostJobPage = () => {
     e.preventDefault()
     setError('')
 
-    if (!form.title || !form.category || !form.budget) {
+    if (!form.title || !form.category || !form.salary) {
       setError('Iltimos, barcha majburiy maydonlarni to\'ldiring')
       return
     }
@@ -127,16 +130,14 @@ const EmployerPostJobPage = () => {
         method: 'POST',
         body: JSON.stringify({
           title: form.title,
-          location: {
-            address: form.location,
-            lat: mapPosition?.[0] || null,
-            lng: mapPosition?.[1] || null,
-          },
-          category: form.category,
-          date: form.date,
-          time: form.time,
-          budget: Number(form.budget.replace(/\D/g, '')),
           description: form.description,
+          location: form.location || 'Toshkent',
+          salary: Number(form.salary.replace(/\D/g, '')),
+          salaryPeriod: form.salaryPeriod,
+          duration: form.date ? `${form.date}${form.time ? ' ' + form.time : ''}` : '',
+          workersNeeded: form.workersNeeded,
+          category: form.category,
+          isUrgent: form.isUrgent,
         }),
       })
       navigate('/employer/jobs')
@@ -229,10 +230,10 @@ const EmployerPostJobPage = () => {
               </div>
             </div>
 
-            {/* Ish hajmi (Budget) */}
+            {/* Maosh (Salary) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ish hajmi (Buget)
+                Maosh
               </label>
               <div className="relative">
                 <svg
@@ -244,11 +245,11 @@ const EmployerPostJobPage = () => {
                 </svg>
                 <input
                   type="text"
-                  name="budget"
-                  value={form.budget}
+                  name="salary"
+                  value={form.salary}
                   onChange={(e) => {
                     const formatted = formatBudget(e.target.value)
-                    setForm((prev) => ({ ...prev, budget: formatted }))
+                    setForm((prev) => ({ ...prev, salary: formatted }))
                   }}
                   placeholder="Masalan: 500 000"
                   className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white transition-all placeholder:text-gray-400"
@@ -256,6 +257,57 @@ const EmployerPostJobPage = () => {
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
                   SO'M
                 </span>
+              </div>
+            </div>
+
+            {/* To'lov davri */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                To'lov davri
+              </label>
+              <select
+                name="salaryPeriod"
+                value={form.salaryPeriod}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white transition-all appearance-none cursor-pointer"
+              >
+                <option value="kun">Kuniga</option>
+                <option value="oy">Oyiga</option>
+                <option value="loyiha">Loyiha bo'yicha</option>
+              </select>
+            </div>
+
+            {/* Ishchilar soni */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ishchilar soni
+              </label>
+              <input
+                type="number"
+                name="workersNeeded"
+                value={form.workersNeeded}
+                onChange={handleChange}
+                min="1"
+                max="100"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white transition-all"
+              />
+            </div>
+
+            {/* Shoshilinch */}
+            <div className="flex items-center gap-3 pt-8">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="isUrgent"
+                  checked={form.isUrgent}
+                  onChange={(e) => setForm((prev) => ({ ...prev, isUrgent: e.target.checked }))}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-red-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+              </label>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Shoshilinch</span>
+                <p className="text-xs text-gray-400">Tezda ishchi kerak bo'lsa belgilang</p>
               </div>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
+import TopUpModal from '../components/TopUpModal'
 
 const filterTabs = ['Barchasi', 'Kirim (Daromad)', 'Chiqim (Xarajat)']
 
@@ -11,22 +12,22 @@ const EmployerWalletPage = () => {
   const [transactions, setTransactions] = useState([])
   const [paymentMethods, setPaymentMethods] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showTopUp, setShowTopUp] = useState(false)
+
+  const fetchWalletData = async () => {
+    try {
+      const data = await apiCall('/wallet')
+      setBalance(data.balance || 0)
+      setTransactions(data.transactions || [])
+      setPaymentMethods(data.paymentMethods || [])
+    } catch (err) {
+      console.error('Wallet data not available:', err)
+    }
+  }
 
   useEffect(() => {
-    const fetchWalletData = async () => {
-      try {
-        const data = await apiCall('/wallet')
-        setBalance(data.balance || 0)
-        setTransactions(data.transactions || [])
-        setPaymentMethods(data.paymentMethods || [])
-      } catch (err) {
-        // Wallet endpoint may not exist yet — show empty state
-        console.error('Wallet data not available:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchWalletData()
+    setLoading(false)
   }, [])
 
   const filteredTransactions = transactions.filter((tx) => {
@@ -74,7 +75,10 @@ const EmployerWalletPage = () => {
             <p className="text-4xl font-bold text-[#1a1a2e]">{formatAmount(balance)} <span className="text-lg font-semibold text-gray-500">UZS</span></p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-[#4f6ef7] hover:bg-[#3b5de7] text-white rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] cursor-pointer border-0">
+            <button
+              onClick={() => setShowTopUp(true)}
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#4f6ef7] hover:bg-[#3b5de7] text-white rounded-xl font-semibold text-sm transition-all duration-200 hover:shadow-[0_4px_14px_rgba(79,110,247,0.35)] cursor-pointer border-0"
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="16" />
@@ -236,6 +240,12 @@ const EmployerWalletPage = () => {
           </>
         )}
       </motion.div>
+      {/* Top Up Modal */}
+      <TopUpModal
+        isOpen={showTopUp}
+        onClose={() => setShowTopUp(false)}
+        onSuccess={fetchWalletData}
+      />
     </>
   )
 }

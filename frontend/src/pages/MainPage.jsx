@@ -87,7 +87,7 @@ const MainPage = () => {
           {/* Logo */}
           <Link to="/home" className="flex items-center gap-2.5 no-underline">
             <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
-              <rect width="36" height="36" rx="8" fill="#4F6EF7" />
+              <rect width="36" height="36" rx="18" fill="#4F6EF7" />
               <path d="M10 26V10h6l4 8 4-8h6v16h-5V17l-3 5-3-5v9h-5z" fill="white" />
             </svg>
             <span className={`text-xl font-bold tracking-tight transition-colors duration-300 ${
@@ -372,7 +372,7 @@ const MainPage = () => {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
                 <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
-                  <rect width="36" height="36" rx="8" fill="#4F6EF7" />
+                  <rect width="36" height="36" rx="18" fill="#4F6EF7" />
                   <path d="M10 26V10h6l4 8 4-8h6v16h-5V17l-3 5-3-5v9h-5z" fill="white" />
                 </svg>
                 <span className="text-lg font-bold">DayWork</span>
