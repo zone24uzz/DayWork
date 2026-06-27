@@ -202,6 +202,10 @@ const EmployerMessagesPage = () => {
     }
   }
 
+  useEffect(() => {
+    document.title = 'DayWork — Xabarlar (Ish beruvchi)'
+  }, [])
+
   const formatTime = (time) => {
     if (!time) return ''
     const date = new Date(time)

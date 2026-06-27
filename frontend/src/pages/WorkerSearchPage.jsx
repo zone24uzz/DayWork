@@ -44,6 +44,10 @@ const WorkerSearchPage = () => {
     return new Date(b.createdAt) - new Date(a.createdAt) // newest
   })
 
+  useEffect(() => {
+    document.title = 'DayWork — Ish qidirish'
+  }, [])
+
   const handleContact = async (employerId) => {
     try {
       await apiCall('/messages/conversation', {

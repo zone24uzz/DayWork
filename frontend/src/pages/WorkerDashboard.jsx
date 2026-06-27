@@ -66,6 +66,10 @@ const WorkerDashboard = () => {
   // Count total jobs available
   const totalJobs = jobs.length
 
+  useEffect(() => {
+    document.title = 'DayWork — Ishchi paneli'
+  }, [])
+
   const formatCurrency = (amount) => {
     if (!amount) return '0'
     if (amount >= 1000000) return `${(amount / 1000000).toFixed(1)}M`

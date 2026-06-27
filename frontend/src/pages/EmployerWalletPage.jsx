@@ -41,6 +41,10 @@ const EmployerWalletPage = () => {
     return amount?.toLocaleString() || '0'
   }
 
+  useEffect(() => {
+    document.title = 'DayWork — Hamyon (Ish beruvchi)'
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">

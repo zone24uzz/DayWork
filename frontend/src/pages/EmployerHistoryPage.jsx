@@ -50,6 +50,10 @@ const EmployerHistoryPage = () => {
   const startItem = historyData.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0
   const endItem = Math.min(currentPage * ITEMS_PER_PAGE, historyData.length)
 
+  useEffect(() => {
+    document.title = 'DayWork — Tarix (Ish beruvchi)'
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">

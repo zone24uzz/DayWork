@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 
 const ProfilePage = () => {
@@ -121,6 +121,10 @@ const ProfilePage = () => {
 
   const inputClass = "w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 outline-none focus:border-[#4f6ef7] focus:bg-white transition-all placeholder:text-gray-400"
   const labelClass = "block text-xs text-gray-400 mb-1"
+
+  useEffect(() => {
+    document.title = 'DayWork — Profil'
+  }, [])
 
   return (
     <div>

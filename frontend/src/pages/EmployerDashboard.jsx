@@ -45,6 +45,10 @@ const EmployerDashboard = () => {
       ]
     : []
 
+  useEffect(() => {
+    document.title = 'DayWork — Ish beruvchi paneli'
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">

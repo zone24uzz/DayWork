@@ -39,6 +39,10 @@ const EmployerJobsPage = () => {
     return { label: 'Faol', color: 'text-[#4f6ef7] bg-[#4f6ef7]/10' }
   }
 
+  useEffect(() => {
+    document.title = 'DayWork — Mening e\'lonlarim'
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">

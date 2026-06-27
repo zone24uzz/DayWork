@@ -33,6 +33,10 @@ const WorkerMyJobsPage = () => {
     }
   }
 
+  useEffect(() => {
+    document.title = 'DayWork — Barcha ishlar'
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">

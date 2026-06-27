@@ -200,6 +200,10 @@ const WorkerMessagesPage = () => {
     }
   }
 
+  useEffect(() => {
+    document.title = 'DayWork — Xabarlar (Ishchi)'
+  }, [])
+
   const formatTime = (time) => {
     if (!time) return ''
     const date = new Date(time)

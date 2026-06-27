@@ -80,6 +80,10 @@ const EmployerPostJobPage = () => {
     }
   }, [])
 
+  useEffect(() => {
+    document.title = 'DayWork — Ish e\'lon qilish'
+  }, [])
+
   const handleMapPositionChange = useCallback((pos) => {
     setMapPosition(pos)
     // Reverse geocode to fill location text

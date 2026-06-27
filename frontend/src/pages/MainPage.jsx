@@ -73,6 +73,10 @@ const MainPage = () => {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+    document.title = 'DayWork — Bosh sahifa'
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#f8f9fc]">
       {/* ═══════════════ NAVBAR ═══════════════ */}

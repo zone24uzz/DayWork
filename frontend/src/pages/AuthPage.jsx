@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -57,6 +58,10 @@ const AuthPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const isLogin = location.pathname === '/login'
+
+  useEffect(() => {
+    document.title = isLogin ? 'DayWork — Kirish' : 'DayWork — Ro\'yxatdan o\'tish'
+  }, [isLogin])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#667eea] to-[#764ba2] p-5">

@@ -22,6 +22,10 @@ const WorkerHistoryPage = () => {
     fetchHistory()
   }, [])
 
+  useEffect(() => {
+    document.title = 'DayWork — Tarix (Ishchi)'
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
