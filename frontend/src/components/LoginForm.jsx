@@ -100,6 +100,7 @@ const LoginForm = () => {
             type="button"
             className="toggle-password"
             onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Parolni yashirish' : 'Parolni ko\'rsatish'}
             tabIndex={-1}
           >
             {showPassword ? (

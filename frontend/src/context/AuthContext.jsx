@@ -45,9 +45,19 @@ export const AuthProvider = ({ children }) => {
       ...options,
       headers,
     })
-    const data = await response.json()
+
+    let data
+    try {
+      data = await response.json()
+    } catch {
+      if (!response.ok) {
+        throw new Error(`Xatolik yuz berdi (${response.status})`)
+      }
+      throw new Error('Serverdan noto\'g\'ri javob keldi')
+    }
+
     if (!response.ok) {
-      throw new Error(data.message || 'Xatolik yuz berdi')
+      throw new Error(data.message || `Xatolik yuz berdi (${response.status})`)
     }
     return data
   }

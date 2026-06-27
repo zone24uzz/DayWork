@@ -135,6 +135,7 @@ const RegisterForm = () => {
             placeholder="Kompaniya nomi"
             value={formData.company}
             onChange={handleChange('company')}
+            autoComplete="organization"
             className={inputClass}
           />
         </div>
@@ -146,6 +147,7 @@ const RegisterForm = () => {
             placeholder="Lavozimingiz"
             value={formData.position}
             onChange={handleChange('position')}
+            autoComplete="organization-title"
             className={inputClass}
           />
         </div>
@@ -170,6 +172,7 @@ const RegisterForm = () => {
           <button
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, userType: 'worker' }))}
+            aria-label="Men ishchiman"
             className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
               formData.userType === 'worker'
                 ? 'border-[#4f6ef7] bg-[#4f6ef7]/5'
@@ -185,6 +188,7 @@ const RegisterForm = () => {
           <button
             type="button"
             onClick={() => setFormData((prev) => ({ ...prev, userType: 'employer' }))}
+            aria-label="Men ish beruvchiman"
             className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
               formData.userType === 'employer'
                 ? 'border-[#4f6ef7] bg-[#4f6ef7]/5'
@@ -218,6 +222,7 @@ const RegisterForm = () => {
               type="button"
               className="toggle-password"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Parolni yashirish' : 'Parolni ko\'rsatish'}
               tabIndex={-1}
             >
               {showPassword ? (
@@ -253,6 +258,7 @@ const RegisterForm = () => {
               type="button"
               className="toggle-password"
               onClick={() => setShowConfirm(!showConfirm)}
+              aria-label={showConfirm ? 'Parolni yashirish' : 'Parolni ko\'rsatish'}
               tabIndex={-1}
             >
               {showConfirm ? (
