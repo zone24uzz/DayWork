@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { io } from 'socket.io-client'
 
-const SOCKET_URL = 'http://localhost:5000'
+const SOCKET_URL = window.location.origin
 
 const gradientColors = [
   'from-yellow-400 to-orange-500',
