@@ -86,6 +86,52 @@ export const AuthProvider = ({ children }) => {
     return data
   }
 
+  // ── Onboarding (tri-state: null=loading, false=not_seen, true=seen) ──
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
+    const localSeen = localStorage.getItem('daywork_onboarding_seen')
+    if (localSeen === 'true') return true
+    // For authenticated users with no local flag, check backend first → null (loading)
+    // For guest users with no flag → false immediately (no flash)
+    const storedToken = localStorage.getItem(TOKEN_KEY)
+    if (storedToken) return null // need backend check
+    return false // guest user, show onboarding immediately
+  })
+
+  // Check onboarding status from backend for authenticated users
+  useEffect(() => {
+    if (isAuthenticated && token && hasSeenOnboarding !== true) {
+      apiCall('/auth/onboarding')
+        .then((data) => {
+          if (data.hasSeenOnboarding) {
+            setHasSeenOnboarding(true)
+            localStorage.setItem('daywork_onboarding_seen', 'true')
+          } else {
+            setHasSeenOnboarding(false)
+          }
+        })
+        .catch(() => {
+          // Backend check failed, default to not seen for guest-like flow
+          setHasSeenOnboarding(false)
+        })
+    } else if (!isAuthenticated && hasSeenOnboarding === null) {
+      // Non-authenticated users without local flag → not seen
+      setHasSeenOnboarding(false)
+    }
+  }, [isAuthenticated, token, hasSeenOnboarding])
+
+  const markOnboardingSeen = async () => {
+    setHasSeenOnboarding(true)
+    localStorage.setItem('daywork_onboarding_seen', 'true')
+    
+    if (token) {
+      try {
+        await apiCall('/auth/onboarding', { method: 'POST' })
+      } catch (err) {
+        console.error('Failed to sync onboarding status:', err)
+      }
+    }
+  }
+
   const updateProfile = async (profileData) => {
     const data = await apiCall('/auth/profile', {
       method: 'PUT',
@@ -122,6 +168,8 @@ export const AuthProvider = ({ children }) => {
       changePassword,
       apiCall,
       isAuthenticated: !!user,
+      hasSeenOnboarding,
+      markOnboardingSeen,
     }}>
       {children}
     </AuthContext.Provider>

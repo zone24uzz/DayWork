@@ -60,6 +60,7 @@ router.post('/register', async (req, res) => {
         position: user.position,
         userType: user.userType,
         avatar: user.name[0].toUpperCase(),
+        hasSeenOnboarding: user.hasSeenOnboarding,
         createdAt: user.createdAt.getFullYear().toString(),
       },
     })
@@ -112,6 +113,7 @@ router.post('/login', async (req, res) => {
         position: user.position,
         userType: user.userType,
         avatar: user.name[0].toUpperCase(),
+        hasSeenOnboarding: user.hasSeenOnboarding,
         createdAt: user.createdAt.getFullYear().toString(),
       },
     })
@@ -249,6 +251,28 @@ router.get('/search', auth, async (req, res) => {
     res.json({ users: formatted })
   } catch (error) {
     console.error('Search users error:', error)
+    res.status(500).json({ message: 'Server xatoligi' })
+  }
+})
+
+// ─── Onboarding ─────────────────────────────────────
+// GET /api/auth/onboarding - Check if user has seen onboarding
+router.get('/onboarding', auth, async (req, res) => {
+  try {
+    res.json({ hasSeenOnboarding: req.user.hasSeenOnboarding || false })
+  } catch (error) {
+    console.error('Get onboarding error:', error)
+    res.status(500).json({ message: 'Server xatoligi' })
+  }
+})
+
+// POST /api/auth/onboarding - Mark onboarding as seen
+router.post('/onboarding', auth, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user._id, { hasSeenOnboarding: true })
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Update onboarding error:', error)
     res.status(500).json({ message: 'Server xatoligi' })
   }
 })

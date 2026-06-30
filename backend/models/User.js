@@ -76,9 +76,16 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  hasSeenOnboarding: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: true,
 })
+
+userSchema.index({ name: 'text' })
+userSchema.index({ email: 1 })
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {

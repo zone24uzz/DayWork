@@ -30,3 +30,17 @@
 input[type="checkbox"] {
   accent-color: #4f6ef7;
 }
+
+/* Onboarding glow animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(79,110,247,0.35);
+  }
+  50% {
+    box-shadow: 0 8px 28px rgba(79,110,247,0.55), 0 0 40px rgba(79,110,247,0.15);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

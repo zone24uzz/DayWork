@@ -50,7 +50,7 @@ const WorkerSearchPage = () => {
 
   const handleContact = async (employerId) => {
     try {
-      await apiCall('/messages/conversation', {
+      await apiCall('/chat/conversation', {
         method: 'POST',
         body: JSON.stringify({ receiverId: employerId }),
       })
